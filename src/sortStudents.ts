@@ -18,6 +18,20 @@ export enum SortType {
 // create SortOrder type
 export type SortOrder = 'asc'| 'desc';
 
+function avg(grades: number[]): number {
+  return grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
+}
+
+function compareStrings(a: string, b: string, order: SortOrder): number {
+  return order === 'asc'
+    ? a.localeCompare(b)
+    : b.localeCompare(a);
+}
+
+function compareNumbers(a: number, b: number, order: SortOrder): number {
+  return order === 'asc' ? a - b : b - a;
+}
+
 export function sortStudents(
   students: Student[],
   sortBy: SortType,
@@ -25,25 +39,17 @@ export function sortStudents(
 ): Student[] {
   const result = [...students];
 
-  function avg(grades: number[]): number {
-    return grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
-  }
-
   switch (sortBy) {
     case SortType.Name:
-      result.sort((a, b) => (order === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)));
+      result.sort((a, b) => (compareStrings(a.name, b.name, order)));
       break;
 
     case SortType.Surname:
-      result.sort((a, b) => (order === 'asc'
-        ? a.surname.localeCompare(b.surname)
-        : b.surname.localeCompare(a.surname)));
+      result.sort((a, b) => (compareStrings(a.surname, b.surname, order)));
       break;
 
     case SortType.Age:
-      result.sort((a, b) => (order === 'asc' ? a.age - b.age : b.age - a.age));
+      result.sort((a, b) => (compareNumbers(a.age, b.age, order)));
       break;
 
     case SortType.Married:
@@ -53,9 +59,11 @@ export function sortStudents(
       break;
 
     case SortType.AverageGrade:
-      result.sort((a, b) => (order === 'asc'
-        ? avg(a.grades) - avg(b.grades)
-        : avg(b.grades) - avg(a.grades)));
+      result.sort((a, b) => (compareNumbers(
+        avg(a.grades),
+        avg(b.grades),
+        order,
+      )));
       break;
 
     default:
